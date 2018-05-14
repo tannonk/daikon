@@ -7,7 +7,7 @@
 
 import tensorflow as tf
 # https://github.com/llSourcell/seq2seq_model_live/blob/master/2-seq2seq-advanced.ipynb
-from tensorflow.python.ops.rnn_cell import LSTMCell, LSTMStateTuple
+# from tensorflow.python.ops.rnn_cell import LSTMCell, LSTMStateTuple
 
 from daikon import constants as C
 
@@ -51,25 +51,32 @@ def define_computation_graph(source_vocab_size: int, target_vocab_size: int, bat
         #                                                          dtype=tf.float32)
 
         ## Bidirectional RNN ##
-        ((encoder_fw_outputs, encoder_bw_outputs), (encoder_fw_final_state, encoder_bw_final_sate)) = (tf.nn.bidirectional_dynamic_rnn(cell_fw=encoder_cell,
-        cell_bw=encoder_cell, inputs=encoder_inputs_embedded, dtype=tf.float32, time_major=True))
+        ((encoder_fw_outputs, encoder_bw_outputs),
+         (encoder_fw_final_state, encoder_bw_final_sate))= (
+             tf.nn.bidirectional_dynamic_rnn(cell_fw=encoder_cell,
+                                             cell_bw=encoder_cell,
+                                             inputs=encoder_inputs_embedded, dtype=tf.float32, time_major=True))
 
-        encoder_outputs = tf.concat((encoder_fw_outputs,
-                                     encoder_bw_outputs), 2)
+        # encoder_outputs = tf.concat(
+        #     (encoder_fw_outputs,
+        #      encoder_bw_outputs), 2)
 
 
-        # encoder_outputs_bi = tf.concat((encoder_fw_outputs,
-        #                                 encoder_bw_outputs),
-        #                                1)
+        encoder_outputs_bi = tf.concat(
+            (encoder_fw_outputs,
+             encoder_bw_outputs), 2)
 
-        encoder_final_state_c = tf.concat((encoder_fw_final_state.c,
-                                           encoder_bw_final_state.c), 1)
+        encoder_final_state_c = tf.concat(
+            (encoder_fw_final_state.c,
+             encoder_bw_final_state.c), 1)
 
-        encoder_final_state_h = tf.concat((encoder_fw_final_state.h,
-                                           encoder_bw_final_state.h), 1)
+        encoder_final_state_h = tf.concat(
+            (encoder_fw_final_state.h,
+             encoder_bw_final_state.h), 1)
 
-        encoder_final_state_bi = LSTMStateTuple(c=encoder_final_state_c,
-                                             h=encoder_final_state_h)
+        encoder_final_state_bi = tf.contrib.rnn.LSTMStateTuple(
+            c=encoder_final_state_c,
+            h=encoder_final_state_h)
 
         # encoder_final_state_bi = tf.concat((encoder_fw_final_state,
         #                                     encoder_bw_final_sate),
