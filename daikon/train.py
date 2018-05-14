@@ -82,6 +82,8 @@ def train(source_data: str,
     logger.info("Reading training data.")
     reader_ids = list(reader.read_parallel(source_data, target_data, source_vocab, target_vocab, C.MAX_LEN))
 
+    dev_ids = list(reader.read_parallel(dev_source, dev_target, source_vocab, target_vocab, C.MAX_LEN))
+
     # define computation graph
     logger.info("Building computation graph.")
 
