@@ -47,10 +47,10 @@ def define_computation_graph(source_vocab_size: int, target_vocab_size: int, bat
 
         initial_state = encoder_cell.zero_state(batch_size, tf.float32)
 
-        encoder_outputs, encoder_final_state = tf.nn.dynamic_rnn(encoder_cell,
-                                                                 encoder_inputs_embedded,
-                                                                 initial_state=initial_state,
-                                                                 dtype=tf.float32)
+        # encoder_outputs, encoder_final_state = tf.nn.dynamic_rnn(encoder_cell,
+        #                                                          encoder_inputs_embedded,
+        #                                                          initial_state=initial_state,
+        #                                                          dtype=tf.float32)
 
         ### Bidirectional RNN ###
         ((encoder_fw_outputs, encoder_bw_outputs),
@@ -60,17 +60,11 @@ def define_computation_graph(source_vocab_size: int, target_vocab_size: int, bat
                                          dtype=tf.float32))
 
         encoder_outputs_bi = tf.concat((encoder_fw_outputs,
-<<<<<<< HEAD
                                         encoder_bw_outputs), 1)
 
         encoder_final_state_bi = tf.concat((encoder_fw_final_state,
                                         encoder_bw_final_sate), 1)
-=======
-                                        encoder_bw_outputs, 1))
 
-        encoder_final_state_bi = tf.concat((encoder_fw_final_state,
-                                        encoder_bw_final_sate, 1))
->>>>>>> 940690cca72c907ab991b0f984783a99cc7e6f64
 
     with tf.variable_scope("Decoder"):
         decoder_cell = tf.contrib.rnn.LSTMCell(C.HIDDEN_SIZE)
