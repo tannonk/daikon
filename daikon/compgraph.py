@@ -44,60 +44,61 @@ def define_computation_graph(source_vocab_size: int, target_vocab_size: int, bat
         encoder_cell = tf.contrib.rnn.LSTMCell(C.HIDDEN_SIZE)
         initial_state = encoder_cell.zero_state(batch_size, tf.float32)
 
-        # Original encoder output, encoder final state
-        # encoder_outputs, encoder_final_state = tf.nn.dynamic_rnn(encoder_cell,
-        #                                                          encoder_inputs_embedded,
-        #                                                          initial_state=initial_state,
-        #                                                          dtype=tf.float32)
+        ## Original encoder output, encoder final state
+        encoder_outputs, encoder_final_state = tf.nn.dynamic_rnn(encoder_cell,
+                                                                 encoder_inputs_embedded,
+                                                                 initial_state=initial_state,
+                                                                 dtype=tf.float32)
 
         ## Bidirectional RNN ##
-        ((encoder_fw_outputs, encoder_bw_outputs),
-         (encoder_fw_final_state, encoder_bw_final_sate))= (
-             tf.nn.bidirectional_dynamic_rnn(cell_fw=encoder_cell,
-                                             cell_bw=encoder_cell,
-                                             inputs=encoder_inputs_embedded, dtype=tf.float32, time_major=True))
+        # ((encoder_fw_outputs, encoder_bw_outputs),
+        #  (encoder_fw_final_state, encoder_bw_final_sate))= (
+        #      tf.nn.bidirectional_dynamic_rnn(cell_fw=encoder_cell,
+        #                                      cell_bw=encoder_cell,
+        #                                      inputs=encoder_inputs_embedded, dtype=tf.float32, time_major=True))
 
         # encoder_outputs = tf.concat(
         #     (encoder_fw_outputs,
         #      encoder_bw_outputs), 2)
 
 
-        encoder_outputs_bi = tf.concat(
-            (encoder_fw_outputs,
-             encoder_bw_outputs), 2)
-
-        encoder_final_state_c = tf.concat(
-            (encoder_fw_final_state.c,
-             encoder_bw_final_state.c), 1)
-
-        encoder_final_state_h = tf.concat(
-            (encoder_fw_final_state.h,
-             encoder_bw_final_state.h), 1)
-
-        encoder_final_state_bi = tf.contrib.rnn.LSTMStateTuple(
-            c=encoder_final_state_c,
-            h=encoder_final_state_h)
+        # encoder_outputs_bi = tf.concat(
+        #     (encoder_fw_outputs,
+        #      encoder_bw_outputs), 2)
+        #
+        # encoder_final_state_c = tf.concat(
+        #     (encoder_fw_final_state.c,
+        #      encoder_bw_final_state.c), 1)
+        #
+        # encoder_final_state_h = tf.concat(
+        #     (encoder_fw_final_state.h,
+        #      encoder_bw_final_state.h), 1)
+        #
+        # encoder_final_state_bi = tf.contrib.rnn.LSTMStateTuple(
+        #     c=encoder_final_state_c,
+        #     h=encoder_final_state_h)
 
         # encoder_final_state_bi = tf.concat((encoder_fw_final_state,
         #                                     encoder_bw_final_sate),
         #                                    1)
 
 
-    # Original decoder initialisation.
-    # with tf.variable_scope("Decoder"):
-    #     decoder_cell = tf.contrib.rnn.LSTMCell(C.HIDDEN_SIZE)
-    #     decoder_outputs, decoder_final_state = tf.nn.dynamic_rnn(decoder_cell,
-    #                                                              decoder_inputs_embedded,
-    #                                                              initial_state=encoder_final_state,
-    #                                                              dtype=tf.float32)
-
-    # Decoder with bidirectional encoder for initialisation.
+    ## Original decoder initialisation.
     with tf.variable_scope("Decoder"):
         decoder_cell = tf.contrib.rnn.LSTMCell(C.HIDDEN_SIZE)
         decoder_outputs, decoder_final_state = tf.nn.dynamic_rnn(decoder_cell,
                                                                  decoder_inputs_embedded,
-                                                                 initial_state=encoder_final_state_bi,
+                                                                 initial_state=encoder_final_state,
                                                                  dtype=tf.float32)
+
+    # Decoder with bidirectional encoder for initialisation.
+    # with tf.variable_scope("Decoder"):
+    #     decoder_cell = tf.contrib.rnn.LSTMCell(C.HIDDEN_SIZE)
+    #     decoder_outputs, decoder_final_state = tf.nn.dynamic_rnn(decoder_cell,
+    #                                                              decoder_inputs_embedded,
+    #                                                              initial_state=encoder_final_state_bi,
+    #                                                              dtype=tf.float32)
+    
     with tf.variable_scope("Logits"):
         decoder_logits = tf.contrib.layers.linear(decoder_outputs, target_vocab_size)
 

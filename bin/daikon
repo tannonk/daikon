@@ -41,6 +41,11 @@ def get_argument_parser():
                        help='the folder to store log files. Use for monitoring with tensorboard.')
     train.add_argument('-s', '--sample_after_epoch', default=False, action="store_true",
                        help='Sample translations from the model after each epoch.')
+    # add dev sets for early stopping
+    train.add_argument('--sourcedev', type=str, dest='dev_source',
+                       help='the source dev data, a tokenized, plain text file.'))
+    train.add_argument('--targetdev', type=str, dest='dev_target',
+                       help='the target dev data, a tokenized, plain text file.'))
 
     # translate
     sample = subparsers.add_parser('translate', help='Use a trained model to translate new text.')

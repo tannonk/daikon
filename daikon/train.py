@@ -11,6 +11,8 @@ import math
 import logging
 import random
 import threading
+################
+import sys
 
 import numpy as np
 import tensorflow as tf
@@ -102,7 +104,6 @@ def train(source_data: str,
         for epoch in range(1, epochs + 1):
             total_loss = 0.0
             total_iter = 0
-
             iter_tic = time.time()
 
             for x, y, z in reader.iterate(reader_ids, batch_size, shuffle=True):
@@ -120,6 +121,45 @@ def train(source_data: str,
                     iter_taken = time.time() - iter_tic
                     logger.debug("Epoch=%s, iteration=%s/%s, samples/second=%.2f", epoch, total_iter, num_batches, batch_size * C.LOGGING_INTERVAL / float(iter_taken))
                     iter_tic = time.time()
+
+
+                    ######
+                    total_loss_dev = 0.0
+                    total_iter_dev = 0
+                    # Set previous iter per at a high perplexity
+                    previous_iter_perplexity = float(1000)
+                    # Set counter to record number of times
+                    c = 0
+
+                    for x, y, z in reader.iterate(dev_ids, batch_size, shuffle=False):
+                        feed_dict = {encoder_inputs: x,
+                                     decoder_inputs: y,
+                                     decoder_targets: z}
+                        l = session.run([loss], feed_dict=feed_dict)
+                        total_loss_dev += l[0]
+                        total_iter_dev += 1
+                        current_iter_perplexity = np.exp(
+                            total_loss_dev / total_iter_dev
+                            )
+
+                    logger.info(
+                        "Current perplexity on dev set: %.2f", current_iter_perplexity)
+
+                    if current_iter_perplexity > previous_iter_perplexity:
+                        c += 1
+                    else:
+                        c = 0
+
+                    if c == 4:
+                        logger.info("Training stopped early. Perplexity on dev data after epoch %s: %.2f", epoch, perplexity)
+                        saver.save(session,
+                                   os.path.join(save_to, C.MODEL_FILENAME))
+                        sys.exit(0)
+
+                    previous_iter_perplexity = current_iter_perplexity
+                    del current_iter_perplexity
+                    ##################################
+
             perplexity = np.exp(total_loss / total_iter)
             logger.info("Perplexity on training data after epoch %s: %.2f", epoch, perplexity)
             saver.save(session, os.path.join(save_to, C.MODEL_FILENAME))
