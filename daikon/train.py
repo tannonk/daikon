@@ -61,6 +61,8 @@ def train(source_data: str,
           save_to: str,
           log_to: str,
           sample_after_epoch: bool,
+          dev_source: str,
+          dev_target: str,
           **kwargs) -> None:
     """Trains a language model. See argument description in `bin/romanesco`."""
 
