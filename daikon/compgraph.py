@@ -57,7 +57,6 @@ def define_computation_graph(source_vocab_size: int, target_vocab_size: int, bat
          (encoder_fw_final_state, encoder_bw_final_sate)) = (tf.nn.bidirectional_dynamic_rnn(cell_fw=encoder_cell,
                                          cell_bw=encoder_cell,
                                          inputs=encoder_inputs_embedded,
-                                         sequence_length=batch_size,
                                          dtype=tf.float32))
 
         encoder_outputs_bi = tf.concat((encoder_fw_outputs,
