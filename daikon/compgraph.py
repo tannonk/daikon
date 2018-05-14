@@ -60,10 +60,10 @@ def define_computation_graph(source_vocab_size: int, target_vocab_size: int, bat
                                          dtype=tf.float32))
 
         encoder_outputs_bi = tf.concat((encoder_fw_outputs,
-                                        encoder_bw_outputs, 1))
+                                        encoder_bw_outputs), 1)
 
         encoder_final_state_bi = tf.concat((encoder_fw_final_state,
-                                        encoder_bw_final_sate, 1))
+                                        encoder_bw_final_sate), 1)
 
     with tf.variable_scope("Decoder"):
         decoder_cell = tf.contrib.rnn.LSTMCell(C.HIDDEN_SIZE)
