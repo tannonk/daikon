@@ -42,7 +42,7 @@ def read_lines(filename: str) -> Iterator[List[str]]:
             yield line.strip().split()
 
 
-def read(filename: str, vocab) -> Iterator[List[int]]:
+def read(filename: str, vocab, reverse=False) -> Iterator[List[int]]:
     """Turns a tokenised text into a list of token ids.
 
     Args:
@@ -55,7 +55,12 @@ def read(filename: str, vocab) -> Iterator[List[int]]:
     """
     lines = read_lines(filename)
     for line in lines:
-        yield [vocab.get_id(word) for word in line]
+        if reverse == True:
+            # reverse read sequence here
+            yield [vocab.get_id(word) for word in line[::-1]]
+        else:
+            yield [vocab.get_id(word) for word in line]
+
 
 
 def read_parallel(source_filename: str,
@@ -89,6 +94,17 @@ def read_parallel(source_filename: str,
             continue
 
         yield (source_ids, target_ids)
+
+    # for source_ids, target_ids in zip(read(source_filename, source_vocab),
+    #                                   read(target_filename, target_vocab)):
+    #     if [] in [source_ids, target_ids]:
+    #         # skip parallel segments where one or both sides are empty
+    #         continue
+    #     if (len(source_ids) > max_length) or (len(target_ids) > max_length):
+    #         # skip segments that are too long
+    #         continue
+    #
+    #     yield (source_ids, target_ids)
 
 
 def pad_sequence(word_ids: List[int], pad_id: int, max_length: int) -> List[int]:
