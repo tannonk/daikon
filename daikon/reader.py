@@ -41,8 +41,24 @@ def read_lines(filename: str) -> Iterator[List[str]]:
         for line in f:
             yield line.strip().split()
 
+# Original read function.
+# def read(filename: str, vocab) -> Iterator[List[int]]:
+#     """Turns a tokenised text into a list of token ids.
+#
+#     Args:
+#         filename: path to tokenised text file, one sentence per line.
+#         vocab: an instance of type daikon.vocab.Vocabulary
+#
+#     Returns:
+#         An iterator that yields a list of lists, where an individual
+#         list contains word ids for one input sentence.
+#     """
+#     lines = read_lines(filename)
+#     for line in lines:
+#         yield [vocab.get_id(word) for word in line]
 
-def read(filename: str, vocab) -> Iterator[List[int]]:
+#### Reverse read functionality
+def read(filename: str, vocab, reverse=False) -> Iterator[List[int]]:
     """Turns a tokenised text into a list of token ids.
 
     Args:
@@ -55,7 +71,10 @@ def read(filename: str, vocab) -> Iterator[List[int]]:
     """
     lines = read_lines(filename)
     for line in lines:
-        yield [vocab.get_id(word) for word in line]
+        if reverse == True:
+            yield [vocab.get_id(word) for word in line[::-1]]
+        else:
+            yield [vocab.get_id(word) for word in line]
 
 
 def read_parallel(source_filename: str,
@@ -79,8 +98,22 @@ def read_parallel(source_filename: str,
         the list of source word ids, and target word ids, respectively.
     """
 
-    for source_ids, target_ids in zip(read(source_filename, source_vocab),
-                                      read(target_filename, target_vocab)):
+    # for source_ids, target_ids in zip(read(source_filename, source_vocab),
+    #                                   read(target_filename, target_vocab)):
+    #     if [] in [source_ids, target_ids]:
+    #         # skip parallel segments where one or both sides are empty
+    #         continue
+    #     if (len(source_ids) > max_length) or (len(target_ids) > max_length):
+    #         # skip segments that are too long
+    #         continue
+    #
+    #     yield (source_ids, target_ids)
+
+    ###### reverse source sequence
+    for source_ids, target_ids in zip(
+        read(source_filename, source_vocab, reverse=True),
+        read(target_filename, target_vocab, reverse=False)
+        ):
         if [] in [source_ids, target_ids]:
             # skip parallel segments where one or both sides are empty
             continue
