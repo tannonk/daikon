@@ -62,7 +62,13 @@ def translate_line(session: tf.Session,
 
         # first session result, first item in batch, target symbol at last position
         next_symbol_logits = logits_result[0][0][-1]
+
+        # Original token selection with argmax
         next_id = np.argmax(next_symbol_logits)
+
+        ####### if np.argmax == unknown word ID, get 2nd argmax value.
+        if next_id == 0:
+            next_id = np.argsort(next_symbol_logits)[-2]
 
         if next_id in [C.EOS_ID, C.PAD_ID]:
             break
