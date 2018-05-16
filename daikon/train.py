@@ -104,6 +104,13 @@ def train(source_data: str,
         tic = time.time()
         num_batches = math.floor(len(reader_ids) / batch_size)
 
+        ####### set variables for early stopping.
+        # Set previous iter per at a high perplexity
+        previous_iter_perplexity = float(1000)
+        # Set counter to record number of times
+        c = 0
+        #######
+
         # iterate over training data `epochs` times
         for epoch in range(1, epochs + 1):
             total_loss = 0.0
@@ -130,10 +137,6 @@ def train(source_data: str,
                     ######
                     total_loss_dev = 0.0
                     total_iter_dev = 0
-                    # Set previous iter per at a high perplexity
-                    previous_iter_perplexity = float(1000)
-                    # Set counter to record number of times
-                    c = 0
 
                     for x, y, z in reader.iterate(dev_ids, batch_size, shuffle=False):
                         feed_dict = {encoder_inputs: x,
@@ -154,7 +157,7 @@ def train(source_data: str,
                     else:
                         c = 0
 
-                    if c == 4:
+                    if c == 5:
                         logger.info("Training stopped early. Perplexity on dev data after epoch %s: %.2f", epoch, perplexity)
                         saver.save(session,
                                    os.path.join(save_to, C.MODEL_FILENAME))
