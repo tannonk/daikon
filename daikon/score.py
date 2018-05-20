@@ -25,7 +25,7 @@ def score(source_data: str, target_data: str, load_from: str, corpus_average: bo
     reader_ids = list(reader.read_parallel(source_data, target_data, source_vocab, target_vocab, C.SCORE_MAX_LEN))
 
     ######## Dev_ids for early stopping in trianing. ########
-    dev_ids = list(reader.read_parallel(dev_source, dev_target, source_vocab, target_vocab, C.SCORE_MAX_LEN))
+    # dev_ids = list(reader.read_parallel(dev_source, dev_target, source_vocab, target_vocab, C.SCORE_MAX_LEN))
 
     encoder_inputs, decoder_targets, decoder_inputs, loss, _, _, _ = define_computation_graph(source_vocab.size, target_vocab.size, batch_size)
 
